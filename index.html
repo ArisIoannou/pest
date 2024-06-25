@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pest ddays</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+
+<style>
+    .map-overlay {
+        font:
+            12px/20px 'Helvetica Neue',
+            Arial,
+            Helvetica,
+            sans-serif;
+        position: absolute;
+        width: 15%;
+        top: 0;
+        left: 0;
+        padding: 10px;
+    }
+
+    .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .map-overlay h2 {
+        line-height: 24px;
+        display: block;
+        margin: 0 0 10px;
+    }
+
+    .map-overlay .legend .bar {
+        height: 10px;
+        width: 100%;
+        background: linear-gradient(to right, #eae7f1, #1201f5);
+    }
+
+    .map-overlay input {
+        background-color: transparent;
+        display: inline-block;
+        width: 100%;
+        position: relative;
+        margin: 0;
+        cursor: ew-resize;
+    }
+
+
+    .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .map-overlay-inner fieldset {
+        display: flex;
+        justify-content: space-between;
+        border: none;
+    }
+
+    .map-overlay-inner label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .map-overlay-inner option {
+        font-size: 14px;
+        
+    }
+
+    .map-overlay-inner .select-fieldset {
+        display: block;
+    }
+
+    .map-overlay-inner .select-fieldset label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .map-overlay-inner .select-fieldset select {
+        width: 100%;
+    }
+
+    .legend {
+        background-color: #fff;
+        border-radius: 3px;
+        
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font:
+            12px/20px 'Helvetica Neue',
+            Arial,
+            Helvetica,
+            sans-serif;
+        padding: 10px;
+        position: absolute;
+        left: 300px;
+        top: 10px;
+        z-index: 1;
+    }
+    .container {
+        background-color: #fff;
+        border-radius: 3px;
+
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font:
+            12px/20px 'Helvetica Neue',
+            Arial,
+            Helvetica,
+            sans-serif;
+        padding: 10px;
+        position: absolute;
+        left: 10px;
+        top: 300px;
+        z-index: 1;
+    }
+
+    .dataframe tr {
+
+    padding: 10px;
+
+    }
+    .dataframe td {
+
+    padding: 2px;
+
+    }
+</style>
+
+</style>
+</head>
+
+<script>
+
+var trt = {
+    "AGROYP" : "black cutworm",
+    "ARGTCI" : "orange tortrix",
+    "LAPHEG" : "beet armyworm",
+    "SPODLI" : "cotton leafworm",
+    "DROSSU" : "cherry drosophila",
+    "TORTPO" : "apple leaf roller",
+    "PARMTR" : "orange-navel worm",
+    "HELIAR" : "cotton bollworm",
+    "OTIOOV" : "strawberry root weevil"
+};
+
+var fiche ={};
+fiche['AGROYP'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>First egg laying</td>      <td>26</td>    </tr>    <tr>      <td>First egg hatch</td>      <td>82</td>    </tr>    <tr>      <td>Small larvae</td>      <td>204</td>    </tr>    <tr>      <td>First 4th instar</td>      <td>260</td>    </tr>    <tr>      <td>Large larvae</td>      <td>371</td>    </tr>    <tr>      <td>First pupae</td>      <td>437</td>    </tr>    <tr>      <td>Last large larvae</td>      <td>537</td>    </tr>    <tr>      <td>First adults</td>      <td>676</td>    </tr>  </tbody></table>';
+fiche['ARGTCI'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>Peak pheromone trap catch</td>      <td>454</td>    </tr>    <tr>      <td>Peak female adult emergence</td>      <td>510</td>    </tr>    <tr>      <td>Peak egg laying</td>      <td>537</td>    </tr>    <tr>      <td>Peak egg hatch</td>      <td>687</td>    </tr>    <tr>      <td>Peak in density large larvae</td>      <td>1132</td>    </tr>  </tbody></table>';
+fiche['DROSSU'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>1st egg laying by ow females</td>      <td>127</td>    </tr>    <tr>      <td>Peak egg laying by ow females; 1st adult emerge 1st gen</td>      <td>265</td>    </tr>    <tr>      <td>1st egg laying by 1st gen females</td>      <td>296</td>    </tr>    <tr>      <td>Peak adult emerge 1st gen</td>      <td>401</td>    </tr>    <tr>      <td>Peak egg laying by 1st gen females; max 2+ gens.</td>      <td>535</td>    </tr>    <tr>      <td>Peak adult emerge 2nd gen; max 3+ gens.</td>      <td>676</td>    </tr>    <tr>      <td>Peak egg laying by 2nd gen females; max 4+ gens.</td>      <td>809</td>    </tr>    <tr>      <td>Peak adult emerge 3rd gen; max 5 gens.</td>      <td>950</td>    </tr>    <tr>      <td>Peak egg laying by 3rd gen females; max 6+ gens.</td>      <td>1083</td>    </tr>    <tr>      <td>Peak adult emerge 4th gen; max 6+ gens.</td>      <td>1225</td>    </tr>    <tr>      <td>Peak egg laying by 4th gen females; max 7+ gens.</td>      <td>1358</td>    </tr>    <tr>      <td>Peak adult emerge 5th gen; max 8+ gens.</td>      <td>1499</td>    </tr>    <tr>      <td>Peak egg laying by 5th gen females; max 9+ gens.</td>      <td>1632</td>    </tr>  </tbody></table>';
+fiche['HELIAR'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>First flight of OW gen. adults (OW as pupae) in pheromone traps</td>      <td>222</td>    </tr>    <tr>      <td>OW gen. peak flight</td>      <td>551</td>    </tr>    <tr>      <td>End OW gen. flight, 1st gen. peak larvae</td>      <td>788</td>    </tr>    <tr>      <td>1st gen. first flight</td>      <td>827</td>    </tr>    <tr>      <td>1st gen. peak flight</td>      <td>1156</td>    </tr>    <tr>      <td>2nd gen. peak larvae and first flight; expect overlapping generations</td>      <td>1395</td>    </tr>    <tr>      <td>2nd gen. peak flight</td>      <td>1761</td>    </tr>    <tr>      <td>3rd gen. first flight</td>      <td>2037</td>    </tr>    <tr>      <td>3rd gen. peak flight</td>      <td>2366</td>    </tr>    <tr>      <td>4th gen. first flight</td>      <td>2642</td>    </tr>    <tr>      <td>4th gen. peak flight</td>      <td>2971</td>    </tr>    <tr>      <td>5th gen. peak flight</td>      <td>3576</td>    </tr>    <tr>      <td>6th gen peak flight</td>      <td>4181</td>    </tr>  </tbody></table>';
+fiche['LAPHEG'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>1st gen. first flight</td>      <td>473</td>    </tr>    <tr>      <td>2nd gen. first flight</td>      <td>963</td>    </tr>    <tr>      <td>3rd gen. first flight</td>      <td>1454</td>    </tr>    <tr>      <td>4th gen. first flight</td>      <td>1944</td>    </tr>    <tr>      <td>5th gen. first flight</td>      <td>2435</td>    </tr>    <tr>      <td>6th gen. first flight</td>      <td>2888</td>    </tr>    <tr>      <td>7th gen. first flight</td>      <td>3416</td>    </tr>  </tbody></table>';
+fiche['OTIOOV'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>Overwintering larvae out of diapause</td>      <td>107</td>    </tr>    <tr>      <td>Pupal development begins</td>      <td>190</td>    </tr>    <tr>      <td>Teneral adult development begins</td>      <td>260</td>    </tr>    <tr>      <td>Peak adult emergence</td>      <td>371</td>    </tr>    <tr>      <td>Peak egglaying</td>      <td>510</td>    </tr>    <tr>      <td>Peak egg hatch</td>      <td>648</td>    </tr>    <tr>      <td>Egg hatch nearly completed</td>      <td>704</td>    </tr>  </tbody></table>';
+fiche['PARMTR'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>  <tr>      <td>1st gen. first flight (mummy almond)</td>      <td>607</td>    </tr>    <tr>      <td>2nd gen. first flight</td>      <td>1017</td>    </tr>    <tr>      <td>3rd gen. first flight</td>      <td>1427</td>    </tr>    <tr>      <td>4th gen. first flight</td>      <td>1837</td>    </tr>    <tr>      <td>5th gen. first flight</td>      <td>2247</td>    </tr></tbody></table>';
+fiche['SPODLI'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>First flight of adults (overwintered as larvae) in pheromone traps</td>      <td>222</td>    </tr>    <tr>      <td>Peak flight OW generation</td>      <td>376</td>    </tr>    <tr>      <td>Peak egghatch 1st generation</td>      <td>426</td>    </tr>    <tr>      <td>First first generation moths</td>      <td>684</td>    </tr>    <tr>      <td>Peak first generation moths</td>      <td>852</td>    </tr>    <tr>      <td>Peak 2nd generation moths</td>      <td>1328</td>    </tr>    <tr>      <td>Peak 3rd generation moths</td>      <td>1803</td>    </tr>    <tr>      <td>Peak 4th generation moths</td>      <td>2279</td>    </tr>    <tr>      <td>Peak 5th generation moths</td>      <td>2755</td>    </tr>  </tbody></table>';
+fiche['TORTPO'] = '<table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event</th>      <th>ddays C</th>    </tr>  </thead>  <tbody>    <tr>      <td>Peak OW/1st gen. pheromone trap catch</td>      <td>257</td>    </tr>    <tr>      <td>Peak OW/1st gen. egg-laying</td>      <td>346</td>    </tr>    <tr>      <td>Peak 2nd gen. egg-hatch</td>      <td>473</td>    </tr>    <tr>      <td>Peak 2nd gen. larvae</td>      <td>676</td>    </tr>    <tr>      <td>Peak 2nd gen. trap catch</td>      <td>1034</td>    </tr>    <tr>      <td>Peak 3rd gen. egg-hatch</td>      <td>1332</td>    </tr>    <tr>      <td>Peak 3rd gen. larvae</td>      <td>1579</td>    </tr>    <tr>      <td>Peak 3rd gen. trap catch</td>      <td>1808</td>    </tr>    <tr>      <td>Peak 4th gen. egg-hatch</td>      <td>2278</td>    </tr>    <tr>      <td>Peak 4th gen. larvae</td>      <td>2525</td>    </tr>    <tr>      <td>Peak 4th gen. trap catch</td>      <td>2583</td>    </tr>  </tbody></table>';
+
+
+var ccdays = {};
+ccdays["AGROYP"] = {"event": ['First egg laying', 'First egg hatch', 'Small larvae', 'First 4th instar', 'Large larvae', 'First pupae', 'Last large larvae', 'First adults'] , "ddays" : [26.0, 82.0, 204.0, 260.0, 371.0, 437.0, 537.0, 676.0]} ;
+ccdays["ARGTCI"] = {"event": ['Peak pheromone trap catch', 'Peak female adult emergence', 'Peak egg laying', 'Peak egg hatch', 'Peak in density large larvae'] , "ddays" : [454.0, 510.0, 537.0, 687.0, 1132.0]} ;
+ccdays["DROSSU"] = {"event": ['1st egg laying by ow females', 'Peak egg laying by ow females; 1st adult emerge 1st gen', '1st egg laying by 1st gen females', 'Peak adult emerge 1st gen', 'Peak egg laying by 1st gen females; max 2+ gens.', 'Peak adult emerge 2nd gen; max 3+ gens.', 'Peak egg laying by 2nd gen females; max 4+ gens.', 'Peak adult emerge 3rd gen; max 5 gens.', 'Peak egg laying by 3rd gen females; max 6+ gens.', 'Peak adult emerge 4th gen; max 6+ gens.', 'Peak egg laying by 4th gen females; max 7+ gens.', 'Peak adult emerge 5th gen; max 8+ gens.', 'Peak egg laying by 5th gen females; max 9+ gens.'] , "ddays" : [127.0, 265.0, 296.0, 401.0, 535.0, 676.0, 809.0, 950.0, 1083.0, 1225.0, 1358.0, 1499.0, 1632.0]} ;
+ccdays["HELIAR"] = {"event": ['First flight of OW gen. adults (OW as pupae) in pheromone traps', 'OW gen. peak flight', 'End OW gen. flight, 1st gen. peak larvae', '1st gen. first flight', '1st gen. peak flight', '2nd gen. peak larvae and first flight; expect overlapping generations', '2nd gen. peak flight', '3rd gen. first flight', '3rd gen. peak flight', '4th gen. first flight', '4th gen. peak flight', '5th gen. peak flight', '6th gen peak flight'] , "ddays" : [222.2, 551.1, 787.8, 827.2, 1156.1, 1395.0, 1761.1, 2036.7, 2365.6, 2641.7, 2970.6, 3575.6, 4180.6]} ;
+ccdays["LAPHEG"] = {"event": ['1st gen. first flight', '2nd gen. first flight', '3rd gen. first flight', '4th gen. first flight', '5th gen. first flight', '6th gen. first flight', '7th gen. first flight'] , "ddays" : [472.8, 963.3, 1454.4, 1944.4, 2435.0, 2887.8, 3416.1]} ;
+ccdays["OTIOOV"] = {"event": ['Overwintering larvae out of diapause', 'Pupal development begins', 'Teneral adult development begins', 'Peak adult emergence', 'Peak egglaying', 'Peak egg hatch', 'Egg hatch nearly completed'] , "ddays" : [107.0, 190.0, 260.0, 371.0, 510.0, 648.0, 704.0]} ;
+ccdays["PARMTR"] = {"event": ['1st gen. first flight (mummy almond)', '2nd gen. first flight', '3rd gen. first flight','4th gen. first flight', '5th gen. first flight'] , "ddays" : [607,1017,1427,1837,2247]} ;
+ccdays["SPODLI"] = {"event": ['First flight of adults (overwintered as larvae) in pheromone traps', 'Peak flight OW generation', 'Peak egghatch 1st generation', 'First first generation moths', 'Peak first generation moths', 'Peak 2nd generation moths', 'Peak 3rd generation moths', 'Peak 4th generation moths', 'Peak 5th generation moths'] , "ddays" : [222.2, 376.1, 425.6, 684.4, 851.7, 1327.8, 1803.3, 2279.4, 2755.0]} ;
+ccdays["TORTPO"] = {"event": ['Peak OW/1st gen. pheromone trap catch', 'Peak OW/1st gen. egg-laying', 'Peak 2nd gen. egg-hatch', 'Peak 2nd gen. larvae', 'Peak 2nd gen. trap catch', 'Peak 3rd gen. egg-hatch', 'Peak 3rd gen. larvae', 'Peak 3rd gen. trap catch', 'Peak 4th gen. egg-hatch', 'Peak 4th gen. larvae', 'Peak 4th gen. trap catch'] , "ddays" : [257.0, 346.0, 473.0, 676.0, 1034.0, 1332.0, 1579.0, 1808.0, 2278.0, 2525.0, 2583.0]} ;
+
+
+function getPestEvent(pestname,degrees) {
+
+    var pestdd = ccdays[pestname]["ddays"];
+
+    var ij = 0;
+
+
+
+    var index=pestdd.findIndex(function(number) {
+        ij++;
+        return number > degrees;
+        
+    });
+    console.log(ij, "IJ");
+    if(ij > 1) {
+    return ccdays[pestname]['event'][ij-1];
+    }
+    else
+    {
+        return "";
+    }
+    
+    
+ 
+};
+
+
+
+
+
+</script>
+
+
+<body>
+<div id="map"></div>
+
+    <div class="map-overlay top">
+
+        <fieldset>
+            <div class="map-overlay-inner">
+                
+                <h2>Select Pest</h2>
+                <select id="peststart" name="peststart">
+                    <!-- Each value matches a light preset -->
+                    <option value="ARGTCI" selected =""><bold>orange tortrix</bold></option>
+                    <option value="AGROYP">black cutworm</option>
+                    <option value="DROSSU">cherry drosophila</option>
+                    <option value="HELIAR">cotton bollworm</option>
+                    <option value="LAPHEG">beet armyworm</option>
+                    <option value="OTIOOV">strawberry root weevil</option>
+                    <option value="PARMTR">navel-orange worm </option>
+                    <option value="SPODLI">cotton leafworm</option>
+                    <option value="TORTPO">apple leaf roller</option>
+
+                </select>
+            </div>
+
+            <div class="map-overlay-inner">
+                <h3>Phenology degree days (C)</h3>
+                <label id="week"></label>
+                <input id="slider" type="range" min="1" max="365" step="7" value="0">
+
+                <div id="legend" class="map-overlay-inner">
+                    <div class="bar"></div>
+                    <div>Biofix: 1st Jan 2024</div>
+                </div>
+            </div>
+
+
+    </fieldset>
+    </div>
+
+    <div id="state-legend" class="legend">
+        <h4>Degree days C</h4>
+        <div><span style="background-color: red; margin-right: 3px; opacity: 0.4; border: 1px;">&nbsp;&nbsp; </span>&nbsp; > 2500 </div>
+        <div><span style="background-color: orange; margin-right: 3px; opacity: 0.4; border: 1px;">&nbsp;&nbsp; </span>&nbsp; 1800-2500</div>
+        <div><span style="background-color: green; margin-right: 3px; opacity: 0.4; border: 1px;">&nbsp;&nbsp; </span>&nbsp; 1000-1800</div>
+        <div><span style="background-color: cyan; margin-right: 3px; opacity: 0.4; border: 1px;">&nbsp;&nbsp; </span>&nbsp; 200-1000</div>
+        <div><span style="background-color: blue; margin-right: 3px; opacity: 0.4; border: 1px;">&nbsp;&nbsp; </span>&nbsp; < 200 </div>
+        <div><span style="background-color: rgb(255, 255, 255); margin-right: 3px; opacity: 0.; border: 1px;">&nbsp;&nbsp; </span>&nbsp; insufficient data </div>
+    </div>
+
+
+    <div id="desccontainer" class="container">
+        <h3>Pest Phenology info for  </h3>
+        <div ><h2><span id="pino" style="font-weight: bold; color: blue;">orange tortrix</span></h2></div>
+        <hr style="color:rgba(66, 62, 62, 0.2)">
+        <!--<div id="nenno"><table class="dataframe">  <thead>    <tr style="text-align: left;">      <th>event_name</th>      <th>degree_days_c</th>    </tr>  </thead>  <tbody>    <tr>      <td>First egg laying</td>      <td>26.0</td>    </tr>    <tr>      <td>First egg hatch</td>      <td>82.0</td>    </tr>    <tr>      <td>Small larvae</td>      <td>204.0</td>    </tr>    <tr>      <td>First 4th instar</td>      <td>260.0</td>    </tr>    <tr>      <td>Large larvae</td>      <td>371.0</td>    </tr>    <tr>      <td>First pupae</td>      <td>437.0</td>    </tr>    <tr>      <td>Last large larvae</td>      <td>537.0</td>    </tr>    <tr>      <td>First adults</td>      <td>676.0</td>    </tr>  </tbody></table></div>-->
+        <div id="nenno">.</div>
+    </div>
+
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWljaGlnbm9sbyIsImEiOiJjbGY3ZDl0ZnAwcTZnM3JwYzRiN2JxNTk2In0.RfsqrdlTHhywjDxLFlUMdQ';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            projection: 'equirectangular',
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: 'mapbox://styles/michignolo/clt8kyvw0008g01pg07x9g48d',
+            center: [-120, 37],
+            zoom: 6
+        });
+    
+
+    
+        function filterBy(day,pestname) {
+
+            const date = new Date('2024-01-01');
+            date.setDate(date.getDate() + day);
+
+            const filters = ['==', 'day', day];
+
+            //console.log(pestname);
+            //map.setFilter('faw-circles', filters);
+            document.getElementById('week').textContent = date.toISOString().split('T')[0];
+            document.getElementById('nenno').innerHTML = fiche[pestname];
+            document.getElementById('pino').innerHTML = trt[pestname];
+            map.setFilter('faw', filters);
+            //map.setFilter('faw-labels', filters);
+    
+            // Set the label to the month
+            //document.getElementById('peststart').textContent = pestname;
+
+        };
+    
+        map.on('load', () => {
+
+            d3.json(
+                'http://0.0.0.0:8080/out/Total_ARGTCI.geojson',
+                jsonCallback
+            );
+        });
+
+
+    
+        function jsonCallback(err, data) {
+            if (err) {
+                throw err;
+            }
+    
+            // Create a month property value based on time
+            // used to filter against.
+            data.features = data.features.map((d) => {
+
+                return d;
+            });
+    
+            map.addSource('faw', {
+                type: 'geojson',
+                data: data
+            });
+    
+
+             map.addLayer(
+                
+            {
+                'id': 'faw',
+                'type': 'fill',
+                'source': 'faw',
+                'paint': {
+
+                    'fill-opacity':  0.4,   
+                    'fill-color': ['interpolate-hcl', ['linear'], ['get', 'ddays'], 0, 'blue', 200, 'cyan', 1000, 'green' , 1800, 'orange', 2500, 'red'],
+                    'fill-stroke-width' : 2,
+                    'fill-outline-color': 'black'
+                }
+                
+            });
+            
+            map.on('click', 'faw', (e) => {
+                var phen_event = getPestEvent(e.features[0].properties.pestname,e.features[0].properties.ddays);
+
+                //console.log(e.features[0].properties.pestname,e.features[0].properties.ddays);
+                var st = "Degree days for <b> ";
+                st = st.concat(trt[e.features[0].properties.pestname], "</b><br><span style='font-weight: bold;'> ", 
+                    e.features[0].properties.ddays, " </span> C" , "<br> ", phen_event, "</br>");
+
+                    
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(st)
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when
+            // the mouse is over the states layer.
+            map.on('mouseenter', 'faw', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change the cursor back to a pointer
+            // when it leaves the states layer.
+            map.on('mouseleave', 'faw', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            /*
+            map.addLayer({
+                'id': 'faw-labels',
+                'type': 'symbol',
+                'source': 'faw',
+                'layout': {
+                    'text-field': ['concat', ['to-string', ['get', 'time']], 'weeks'],
+                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                    'text-size': 12
+                },
+                'paint': {
+                    'text-color': 'rgba(0,0,0,0.5)'
+                }
+            }); */
+    
+            // Set filter to first month of the year
+            // 0 = January
+            filterBy(1,"ARGTCI");
+    
+            document.getElementById('peststart').addEventListener('input', (e) => {
+                const pestname = e.target.value;
+                //alert(pestname);
+                var datafile = "out/Total_";
+                datafile = datafile.concat(pestname,".geojson");
+                map.getSource("faw").setData(datafile);
+
+                document.getElementById('slider').value = 1;
+
+                filterBy(1,pestname);
+            });
+
+            document.getElementById('slider').addEventListener('input', (e) => {
+                const day = parseInt(e.target.value, 10);
+                var pestname = document.getElementById('peststart').value;
+                filterBy(day,pestname);
+            });
+        }
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
